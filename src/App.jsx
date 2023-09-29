@@ -3,86 +3,69 @@ import { useState } from 'react'
 import { Button, Col, Container, Form, InputGroup, Row, Table } from 'react-bootstrap'
 
 // Import custom
-// ...
+import { parse } from './toolkits/parse'
 
 // Import assets
 import 'scss/site.scss'
 
-const START = "{\"rankInfo\":"
-const END = "}]}"
-
-function _parse(file, set) {
-  const reader = new FileReader()
-
-  reader.addEventListener('load', (e) => {
-    try {
-      const start = e.target.result.lastIndexOf(START)
-      const end = e.target.result.indexOf(END, start)
-      const data = JSON.parse(e.target.result.substring(start, end + END.length + 1))
-
-      set(data?.rankInfo.map((entry) => {
-        const { uid, score, name, abbr, serverId} = entry
-        return { uid, score, name, abbr, serverId}
-      }))
-    } catch (err) {
-      console.error(err)
-    }
-
-  })
-
-  reader.readAsText(file)
-}
+const captions = ['Daily', 'Weekly']
 
 function App() {
   // States
-  const [data, setData] = useState([])
+  const [weekly, setWeekly] = useState([])
+  const [daily, setDaily] = useState([])
 
-  const handleFile = (e) => {
-    _parse(e.target.files[0], setData)
+  const handleFile = async (e) => {
+    const data = await parse(e.target.files[0])
+
+    setDaily(data.daily)
+    setWeekly(data.weekly)
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
   }
 
-  console.log(data)
-
   return (
-    <Container className="w-100 h-100">
-      <Row className="border border-secondary rounded bg-dark w-100">
-        <Col>
-          <Form className="p-2 w-100" onSubmit={handleSubmit}>
-            <InputGroup size="lg">
-              <InputGroup.Text>Daily Score File</InputGroup.Text>
-              <Form.Control type="file" accept=".txt, .json" onChange={handleFile} />
-              <Button variant="outline-success" type="submit">Parse</Button>
-            </InputGroup>
-          </Form>
-        </Col>
-      </Row>
-      {data.length > 0 && (
-        <Row className="border border-secondary rounded bg-dark mt-2 w-100">
+    <Container className="d-flex flex-column justify-content-center align-items-center pt-2 pb-1 w-100 h-100">
+        <Row className="top mb-1 w-100">
           <Col>
-            <div className="overflow-scroll" style={{maxHeight: "418px"}} >
-              <Table hover striped borderless>
-                <thead>
-                  <tr>
-                    {Object.keys(data[0]).map((title) => (<th key={title}>{title}</th>))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((entry) => (
-                    <tr key={entry.uid}>
-                      {Object.values(entry).map((stat, i) => (
-                        <td key={i}>{stat}</td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </div>
+            <img src="/logo.png" />
+            <Form className="border border-secondary rounded bg-dark p-2 w-100" onSubmit={handleSubmit}>
+              <InputGroup size="lg">
+                <InputGroup.Text>Daily Score File</InputGroup.Text>
+                <Form.Control type="file" accept=".txt, .json" onChange={handleFile} />
+                <Button variant="outline-success" type="submit">Parse</Button>
+              </InputGroup>
+            </Form>
           </Col>
         </Row>
+      {[daily, weekly].map((tbl, i) =>
+        tbl.length > 0 && (
+          <Row className="bottom py-1 w-100 overflow-hidden" key={captions[i]}>
+            <Col className="h-100">
+              <div className="border border-secondary rounded bg-dark h-100 overflow-auto" >
+                <Table className="caption-top" hover striped borderless>
+                  <caption className="px-2">{captions[i]}</caption>
+                  <thead>
+                    <tr>
+                      {Object.keys(tbl[0]).map((title) => (<th key={title}>{title}</th>))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tbl.map((entry) => (
+                      <tr key={entry.uid}>
+                        {Object.values(entry).map((stat, i) => (
+                          <td key={i}>{stat}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+            </Col>
+          </Row>
+        )
       )}
     </Container>
   )

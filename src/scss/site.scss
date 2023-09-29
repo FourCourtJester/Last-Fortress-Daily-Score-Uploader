@@ -7,10 +7,15 @@
 @import "@fortawesome/fontawesome-free/css/solid.css";
 
 body {
-  background: url("https://prem.last-fortress.net/bc980cfcadfac05a445997119d831c1a.jpg") 50% 50% no-repeat;
+  background: url("/background-1.jpg") 50% 50% no-repeat;
+  background-attachment: fixed;
   background-size: cover;
 
-  .container {
-    padding-top: 49vh;
+  .top {
+    height: 200px;
+  }
+
+  .bottom {
+    height: calc(100% - 200px - #{map-get(bs.$spacers, 2)});
   }
 }
