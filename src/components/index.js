@@ -1,0 +1,1 @@
+export { InteractiveTable as Table } from './Table'

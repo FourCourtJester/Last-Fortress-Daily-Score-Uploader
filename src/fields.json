@@ -1,0 +1,44 @@
+{
+  "donationsRaw": [
+    "uid",
+    "username",
+    "type",
+    "time"
+  ],
+  "donations": [
+    "uid",
+    "name"
+  ],
+  "members": [
+    "uid",
+    "name",
+    "rank",
+    "power",
+    "armyKill",
+    "resist",
+    "mainCityLv",
+    "curServerId"
+  ],
+  "daily": [
+    "uid",
+    "score",
+    "name",
+    "abbr",
+    "serverId"
+  ],
+  "weekly": [
+    "uid",
+    "score",
+    "name",
+    "abbr",
+    "serverId"
+  ],
+  "score": [
+    "uid",
+    "daily",
+    "weekly",
+    "name",
+    "abbr",
+    "serverId"
+  ]
+}
