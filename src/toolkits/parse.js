@@ -1,8 +1,16 @@
 // Import Assets
 import fields from 'fields.json'
 
-function _sort(a, b) {
-  return b.serverId - a.serverId
+function _sortDonations(a, b) {
+  return b.uid - a.uid
+}
+
+function _sortMembers(a, b) {
+  return b.uid - a.uid || b.mainCityLv - a.mainCityLv || b.power - a.power
+}
+
+function _sortScore(a, b) {
+  return b.serverId - a.serverId || b.uid - a.uid
 }
 
 function _obj(obj, keys) {
@@ -32,7 +40,7 @@ function _parseMembers(file) {
   const end = file.indexOf(END, start)
   const results = JSON.parse(file.substring(start, end + END.length + 1))
 
-  return Object.freeze(results.list.map((entry) => _obj(entry, fields.members)))
+  return Object.freeze(results.list.map((entry) => _obj(entry, fields.members)).sort(_sortMembers))
 }
 
 function _parseScore(file, cursor, report) {
@@ -47,7 +55,7 @@ function _parseScore(file, cursor, report) {
 
   return {
     cursor: end,
-    results: Object.freeze(results.rankInfo.sort(_sort).map((entry) => _obj(entry, fields[report])))
+    results: Object.freeze(results.rankInfo.map((entry) => _obj(entry, fields[report])).sort(_sortScore))
   }
 }
 
@@ -63,7 +71,11 @@ function _remixDonations(donations) {
     return obj
   }, {})
 
-  return Object.values(results).sort((a, b) => b.donations.length - a.donations.length)
+  return Object.values(results).map((entry) => {
+    const free = entry.donations.filter((donation) => donation.type === 3)
+
+    return { ...entry, free: free.length, paid: entry.donations.length - free.length}
+  }).sort(_sortDonations)
 }
 
 function _remixScore(daily, weekly) {
@@ -74,7 +86,7 @@ function _remixScore(daily, weekly) {
     results[entry.uid].weekly = entry.score
   })
 
-  return Object.values(results).sort(_sort)
+  return Object.values(results).sort(_sortScore)
 }
 
 export function parse(file) {

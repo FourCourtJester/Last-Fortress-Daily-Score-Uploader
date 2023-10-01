@@ -7,7 +7,9 @@
   ],
   "donations": [
     "uid",
-    "name"
+    "name",
+    "free",
+    "paid"
   ],
   "members": [
     "uid",
